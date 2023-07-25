@@ -1,0 +1,31 @@
+{
+  "name": "@star-one/git-commit",
+  "version": "0.0.1",
+  "description": "用于优化git提交",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx rollup -c",
+    "run-iq": "node ./dist/index.js"
+  },
+  "keywords": [
+    "git"
+  ],
+  "author": {
+    "name": "waker",
+    "email": "1209562577@qq.com",
+    "url": "https://www.yuque.com/star-one"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^9.2.8",
+    "rollup": "^3.26.3",
+    "simple-git": "^3.19.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.2",
+    "@types/inquirer": "^9.0.3",
+    "tslib": "^2.6.0",
+    "typescript": "^5.1.6"
+  }
+}
