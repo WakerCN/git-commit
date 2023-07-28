@@ -7,10 +7,13 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "skipFiles": ["<node_internals>/**"],
-      "preLaunchTask": "npm: build",
-      "program": "${workspaceFolder}\\src\\index.ts"
+      "name": "Launch git",
+      "program": "${workspaceFolder}/src/index.ts",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ],
+      "console": "integratedTerminal"
     }
   ]
 }
