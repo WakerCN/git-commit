@@ -1,19 +1,18 @@
+#! /usr/bin/env node
+
 /*
  * @Author       : 魏威 <1209562577@qq.com>
  * @Date         : 2023-07-20 15:02 周4
  * @Description  :
  */
-import iq from "inquirer";
-// import { TypeInfoList } from "./const";
+import inquirer from "inquirer";
+import inquirerPrompt from "inquirer-autocomplete-prompt";
 
+import dedent from "dedent";
+import { SimpleGit, SimpleGitOptions, simpleGit } from "simple-git";
+import log from "simple-git/dist/src/lib/tasks/log";
 
-import {
-  simpleGit,
-  CleanOptions,
-  SimpleGit,
-  SimpleGitOptions
-} from "simple-git";
-
+inquirer.registerPrompt("autocomplete", inquirerPrompt);
 
 /** 提交类型包含的信息 */
 export interface CommitTypeInfo {
@@ -49,13 +48,13 @@ export const TypeInfoList: CommitTypeInfo[] = [
 
 /** type list */
 export const typeList = TypeInfoList.map((info) => info.type);
+
 export const typeWhithEmojiList = TypeInfoList.map(
   (info) => info.emoji + " " + info.type
 );
 
-
 export class GitMananger {
-  public constructor() { }
+  public constructor() {}
 
   private static sgInstance: SimpleGit;
 
@@ -77,8 +76,43 @@ export class GitMananger {
   }
 }
 
-async function main() {
-  const promptValues = await iq.prompt([
+async function showGitStatus() {
+  const gitInstance = new GitMananger().getInstance();
+  const statusInfo = await gitInstance.status();
+  console.log(dedent`
+    ============ git info ============
+    当前分支: ${statusInfo.current}
+    A: ${statusInfo.created.length}
+    M: ${statusInfo.modified.length}
+    D: ${statusInfo.deleted.length}
+    =================================
+  `);
+  const promptResult = await inquirer.prompt({
+    name: "promptResult",
+    type: "confirm",
+    message: "提交基本信息如上，是否继续提交?"
+  });
+  if (!promptResult.promptResult) {
+    return Promise.reject("终止提交");
+  }
+}
+
+enum DetailType {
+  OneLine,
+  MutiLine
+}
+
+async function confirmCommitMsg() {
+  const promptValues = await inquirer.prompt([
+    {
+      name: "detailType",
+      type: "list",
+      message: "请选择提交msg的格式",
+      choices: [
+        { name: "单行", value: DetailType.OneLine },
+        { name: "多行", value: DetailType.MutiLine }
+      ]
+    },
     {
       name: "type",
       message: "选择提交类型",
@@ -91,21 +125,63 @@ async function main() {
       }))
     },
     {
-      name: 'scope',
-      type: 'input',
-      message: "请填写作用范围（scope）",
+      name: "scope",
+      type: "input",
+      message: "请填写作用范围（scope）"
     },
     {
-      name: 'detail',
-      type: 'input',
+      name: "detail",
+      type: "input",
       message: "请填写详细信息（detail）",
+      when: (answer) => {
+        return answer.detailType === DetailType.OneLine;
+      }
+    },
+    {
+      name: "detail",
+      type: "editor",
+      message: "请填写详细信息（detail）",
+      when: (answer) => {
+        return answer.detailType === DetailType.MutiLine;
+      }
     }
   ]);
-  const gitManager = new GitMananger().getInstance();
-  const typeInfo = TypeInfoList.find((t) => t.type === promptValues.type)
-  const commitMsg = `${typeInfo.emoji} ${typeInfo.type} <${promptValues.scope}>\n${promptValues.detail}`
-  console.log(commitMsg)
-  await gitManager.commit(`${typeInfo.emoji} ${typeInfo.type} <${promptValues.scope}>\n${promptValues.detail}`);
+
+  const typeInfo = TypeInfoList.find((t) => t.type === promptValues.type);
+
+  /** 根据不同类型生产不同的msg
+   ************************************************/
+  let commitMsg: string;
+  switch (promptValues.detailType as DetailType) {
+    case DetailType.OneLine:
+      commitMsg =
+        `${typeInfo.emoji} ${typeInfo.type}` +
+        (promptValues.scope ? ` <${promptValues.scope}>` : "") +
+        (promptValues.detail ? ` ${promptValues.detail}` : "");
+      break;
+    case DetailType.MutiLine:
+      commitMsg =
+        `${typeInfo.emoji} ${typeInfo.type}` +
+        (promptValues.scope ? ` <${promptValues.scope}>` : "") +
+        (promptValues.detail ? `\n${promptValues.detail}` : "");
+      break;
+  }
+  const gitInstance = new GitMananger().getInstance();
+  try {
+    await gitInstance.commit(commitMsg.trimEnd());
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-export default main();
+async function main() {
+  try {
+    await showGitStatus();
+    await confirmCommitMsg();
+  } catch (error) {
+    console.log(error);
+    return;
+  }
+}
+
+main();
