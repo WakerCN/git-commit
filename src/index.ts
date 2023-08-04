@@ -10,7 +10,7 @@ import inquirerPrompt from "inquirer-autocomplete-prompt";
 
 import dedent from "dedent";
 import { SimpleGit, SimpleGitOptions, simpleGit } from "simple-git";
-import log from "simple-git/dist/src/lib/tasks/log";
+import { intersection } from "lodash-es";
 
 inquirer.registerPrompt("autocomplete", inquirerPrompt);
 
@@ -79,12 +79,14 @@ export class GitMananger {
 async function showGitStatus() {
   const gitInstance = new GitMananger().getInstance();
   const statusInfo = await gitInstance.status();
+  const { staged, created, modified, deleted } = statusInfo;
+  // prettier-ignore
   console.log(dedent`
     ============ git info ============
-    当前分支: ${statusInfo.current}
-    A: ${statusInfo.created.length}
-    M: ${statusInfo.modified.length}
-    D: ${statusInfo.deleted.length}
+    当前分支: ${statusInfo.current} ahead: ${statusInfo.ahead} behind: ${statusInfo.behind}
+    A: ${intersection(staged, created).length}
+    M: ${intersection(staged, modified).length}
+    D: ${intersection(staged, deleted).length}
     =================================
   `);
   const promptResult = await inquirer.prompt({
@@ -166,10 +168,24 @@ async function confirmCommitMsg() {
         (promptValues.detail ? `\n${promptValues.detail}` : "");
       break;
   }
-  const gitInstance = new GitMananger().getInstance();
+  commitMsg = commitMsg.trimEnd();
+  console.log("\n");
+  console.log(commitMsg);
+  console.log("\n");
+  const comfirmCommit = await inquirer.prompt({
+    name: "sureToCommit",
+    type: "confirm",
+    message: "提交msg如上，是否继续提交?"
+  });
+  if (!comfirmCommit.sureToCommit) {
+    return;
+  }
   try {
-    await gitInstance.commit(commitMsg.trimEnd());
+    const gitInstance = new GitMananger().getInstance();
+    await gitInstance.commit(commitMsg);
+    console.log("✔️ git commit 提交成功!");
   } catch (error) {
+    console.log("❌ git commit 提交失败!");
     console.log(error);
   }
 }
