@@ -2,7 +2,7 @@
 
 # 效果
 
-![效果图](assets/git-commit.gif)
+![效果图](./assets/git-commit.gif)
 
 # 安装
 
