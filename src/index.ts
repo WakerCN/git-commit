@@ -169,9 +169,7 @@ async function confirmCommitMsg() {
       break;
   }
   commitMsg = commitMsg.trimEnd();
-  console.log("\n");
   console.log(commitMsg);
-  console.log("\n");
   const comfirmCommit = await inquirer.prompt({
     name: "sureToCommit",
     type: "confirm",
