@@ -5,8 +5,12 @@
   "type": "module",
   "main": "index.js",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
+  "files": [
+    "dist"
+  ],
   "bin": {
     "gec": "./dist/index.js"
   },
