@@ -1,6 +1,6 @@
 {
   "name": "@star-one/git-commit",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "用于优化git提交",
   "type": "module",
   "main": "index.js",
