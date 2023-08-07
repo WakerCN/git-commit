@@ -1,10 +1,8 @@
-- [设计文档](https://www.yuque.com/star-one/font-end/yynvzwpwtl642i3v?singleDoc)
+<a href="https://www.yuque.com/star-one/font-end/yynvzwpwtl642i3v?singleDoc" target="_blank">设计文档</a>
 
 # 效果
 
-<video controls>
-  <source src="assets/git-msg.mp4" type="video/mp4">
-</video>
+![效果图](assets/git-commit.gif)
 
 # 安装
 
