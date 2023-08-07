@@ -2,6 +2,10 @@
 
 # 效果
 
+<video controls>
+  <source src="assets/git-msg.mp4" type="video/mp4">
+</video>
+
 # 安装
 
 可以使用 node 全局安装
