@@ -41,7 +41,7 @@ export const TypeInfoList: CommitTypeInfo[] = [
   /** 其他
   -------------------------------------- */
   { type: "test", emoji: "🧪", detail: "添加测试或者修改现有测试" },
-  { type: "perf", emoji: "⚡", detail: "提高性能" },
+  { type: "perf", emoji: "🌈", detail: "提高性能" },
   { type: "ci", emoji: "💻", detail: "与CI（持续集成服务）有关的改动" },
   { type: "chore", emoji: "🔧", detail: "构建过程或辅助工具的变动" }
 ];
